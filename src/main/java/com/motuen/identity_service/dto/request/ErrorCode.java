@@ -7,7 +7,8 @@ public enum ErrorCode {
     USERNAME_INVALID(1003, "User name must be at least 5 characters."),
     PASSWORD_INVALID(1004, "Password must be at least 8 characters."),
     INVALID_MESSAGE(1005, "Invalid message key.") // If enter an error key during coding
-    ;
+    ,
+    UNAUTHENTICATED(1006, "Unauthenticated.");
 
     ErrorCode(int code, String message) {
         this.code = code;
