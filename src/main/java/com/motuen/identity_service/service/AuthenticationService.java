@@ -1,7 +1,7 @@
 package com.motuen.identity_service.service;
 
 import com.motuen.identity_service.dto.request.AuthenticationRequest;
-import com.motuen.identity_service.dto.request.ErrorCode;
+import com.motuen.identity_service.exception.ErrorCode;
 import com.motuen.identity_service.dto.request.IntrospectRequest;
 import com.motuen.identity_service.dto.response.AuthenticationResponse;
 import com.motuen.identity_service.dto.response.IntrospectResponse;
@@ -23,7 +23,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.management.remote.JMXServerErrorException;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -102,7 +101,14 @@ public class AuthenticationService {
     private String buildScope(User user){
         StringJoiner stringJoiner = new StringJoiner(" ");
         if(!CollectionUtils.isEmpty(user.getRoles()))
-            user.getRoles().forEach(stringJoiner::add);
+            user.getRoles().forEach(role -> {
+                stringJoiner.add("ROLE_" + role.getName());
+                if(!CollectionUtils.isEmpty(role.getPermissions())){
+                    role.getPermissions().forEach(permission -> {
+                        stringJoiner.add(permission.getName());
+                    });
+                }
+            });
 
         return stringJoiner.toString();
     }

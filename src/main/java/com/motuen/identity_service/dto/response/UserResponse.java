@@ -1,8 +1,6 @@
 package com.motuen.identity_service.dto.response;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.motuen.identity_service.entity.Role;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -20,5 +18,5 @@ public class UserResponse {
     String firstName;
     String lastName;
     LocalDate dob;
-    Set<String> roles;
+    Set<Role> roles;
 }

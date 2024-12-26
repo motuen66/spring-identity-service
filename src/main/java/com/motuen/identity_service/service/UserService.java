@@ -1,6 +1,6 @@
 package com.motuen.identity_service.service;
 
-import com.motuen.identity_service.dto.request.ErrorCode;
+import com.motuen.identity_service.exception.ErrorCode;
 import com.motuen.identity_service.dto.request.UserCreationRequest;
 import com.motuen.identity_service.dto.request.UserUpdateRequest;
 import com.motuen.identity_service.dto.response.UserResponse;
@@ -8,15 +8,14 @@ import com.motuen.identity_service.entity.User;
 import com.motuen.identity_service.enums.Role;
 import com.motuen.identity_service.exception.AppException;
 import com.motuen.identity_service.mapper.UserMapper;
+import com.motuen.identity_service.repository.RoleRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.motuen.identity_service.repository.UserRepository;
@@ -33,6 +32,7 @@ public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
+    RoleRepository roleRepository;
 
     public UserResponse createUser(UserCreationRequest request){
         if(userRepository.existsByUsername(request.getUsername()))
@@ -44,14 +44,15 @@ public class UserService {
         HashSet<String> roles = new HashSet<>();
         roles.add(Role.USER.name());
 
-        user.setRoles(roles);
+//        user.setRoles(roles);
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('APPROVE_POST')")
     public List<UserResponse> getUsers(){
-        log.info("Inmethod get users.");
+        log.info("In method get users.");
         List<UserResponse> list = new ArrayList<>();
         List<User> foundList = userRepository.findAll();
         for(User user : foundList){
@@ -78,7 +79,12 @@ public class UserService {
     public UserResponse updateUser(String userId, UserUpdateRequest request){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not exist."));
+
         userMapper.updateUser(user, request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        var roles = roleRepository.findAllById(request.getRoles());
+        user.setRoles(new HashSet<>(roles));
 
         return userMapper.toUserResponse(userRepository.save(user));
     }

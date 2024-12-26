@@ -1,19 +1,20 @@
 package com.motuen.identity_service.controller;
 
-import com.motuen.identity_service.configuration.SecurityConfig;
 import com.motuen.identity_service.dto.request.ApiResponse;
 import com.motuen.identity_service.dto.request.UserCreationRequest;
 import com.motuen.identity_service.dto.request.UserUpdateRequest;
 import com.motuen.identity_service.dto.response.UserResponse;
+import com.motuen.identity_service.exception.AppException;
+import com.motuen.identity_service.exception.ErrorCode;
+import com.motuen.identity_service.repository.UserRepository;
+import com.motuen.identity_service.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import com.motuen.identity_service.service.UserService;
 
 @RestController
 @RequestMapping("/users")
@@ -21,6 +22,7 @@ import com.motuen.identity_service.service.UserService;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class UserController {
+    private final UserRepository userRepository;
     UserService userService;
 
     @PostMapping
@@ -58,7 +60,7 @@ public class UserController {
     @PutMapping("/{userId}")
     ApiResponse<UserResponse> updateUser(@PathVariable("userId") String userId, @RequestBody UserUpdateRequest request){
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.getUser(userId));
+        apiResponse.setResult(userService.updateUser(userId, request));
         return apiResponse;
     }
     @DeleteMapping("/{userId}")

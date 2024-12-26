@@ -1,7 +1,5 @@
 package com.motuen.identity_service.exception;
 
-import com.motuen.identity_service.dto.request.ErrorCode;
-
 public class AppException extends RuntimeException{
     private ErrorCode errorCode;
 
