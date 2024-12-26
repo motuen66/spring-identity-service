@@ -17,7 +17,7 @@ spring:
     show-sql: true
 
 jwt:
-  signerKey: "1DphB90eCAa+E/MNGnxcyE3eTO4+Uzn5m1rtKNm27YHyLEb26PUy/2IV6+1JS2xC"
+  signerKey: ""
 
 logging:
   level:
