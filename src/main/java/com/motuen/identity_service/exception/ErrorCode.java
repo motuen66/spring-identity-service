@@ -9,11 +9,12 @@ public enum ErrorCode {
     USER_EXISTED(1002, "User existed.", HttpStatus.BAD_REQUEST),
     USER_NOT_EXISTED(1001, "User not existed.", HttpStatus.NOT_FOUND),
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized Error.", HttpStatus.INTERNAL_SERVER_ERROR),
-    USERNAME_INVALID(1003, "User name must be at least 5 characters.", HttpStatus.BAD_REQUEST),
-    PASSWORD_INVALID(1004, "Password must be at least 8 characters.", HttpStatus.BAD_REQUEST),
+    USERNAME_INVALID(1003, "User name must be at least {min} characters.", HttpStatus.BAD_REQUEST),
+    PASSWORD_INVALID(1004, "Password must be at least {min} characters.", HttpStatus.BAD_REQUEST),
     INVALID_MESSAGE(1005, "Invalid message key.", HttpStatus.BAD_REQUEST), // If enter an error key during coding
     UNAUTHENTICATED(1006, "Unauthenticated.", HttpStatus.UNAUTHORIZED),
-    UNAUTHORIZED(1007, "You do not have permission.", HttpStatus.FORBIDDEN);
+    UNAUTHORIZED(1007, "You do not have permission.", HttpStatus.FORBIDDEN),
+    INVALID_DOB(1008, "User age must be at least {min} years.", HttpStatus.BAD_REQUEST);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
