@@ -1,8 +1,8 @@
 package com.motuen.identity_service.service;
 
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.motuen.identity_service.dto.request.AuthenticationRequest;
 import com.motuen.identity_service.dto.request.LogoutRequest;
+import com.motuen.identity_service.dto.request.RefreshRequest;
 import com.motuen.identity_service.entity.InvalidatedToken;
 import com.motuen.identity_service.exception.ErrorCode;
 import com.motuen.identity_service.dto.request.IntrospectRequest;
@@ -89,6 +89,34 @@ public class AuthenticationService {
                 .build();
 
         invalidatedTokenRepository.save(invalidatedToken);
+    }
+
+    public AuthenticationResponse refreshToken(RefreshRequest request)
+            throws ParseException, JOSEException {
+        var signedJWT = verifyToken(request.getToken());
+
+        var jit = signedJWT.getJWTClaimsSet().getJWTID();
+
+        var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                .id(jit)
+                .expirityTime(expiryTime)
+                .build();
+
+        invalidatedTokenRepository.save(invalidatedToken);
+
+        var username = signedJWT.getJWTClaimsSet().getSubject();
+        var user = userRepository.findByUsername(username).orElseThrow(
+                () -> new AppException(ErrorCode.UNAUTHENTICATED)
+        );
+
+        var token = generateToken(user);
+
+        return AuthenticationResponse.builder()
+                .token(token)
+                .authenticated(true)
+                .build();
     }
 
     private SignedJWT verifyToken(String token) throws JOSEException, ParseException {
